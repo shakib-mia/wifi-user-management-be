@@ -1,0 +1,31 @@
+[
+  {
+    "mac": "EC:F2:2B:43:F4:FA",
+    "username": "My phone",
+    "last-paid": "0-0-0000"
+  },
+  {
+    "mac": "0C:90:43:5C:B3:BF",
+    "username": "Niloy 1",
+    "last-paid": "0-0-0000"
+  },
+  {
+    "mac": "30:AF:CE:47:30:03",
+    "username": "Niloy 2",
+    "last-paid": "0-0-0000"
+  },
+  {
+    "mac": "38:38:4B:A7:9C:50",
+    "username": "Jamal vai",
+    "last-paid": "0-0-0000"
+  },
+  { "mac": "F0:6C:5D:AE:30:D6", "username": "Ramisa", "last-paid": "0-0-0000" },
+  { "mac": "48:79:4D:FD:1E:23", "username": "Siyam", "last-paid": "0-0-0000" },
+  { "mac": "48:02:86:88:DC:4F", "username": "Nishad", "last-paid": "0-0-0000" },
+  { "mac": "88:B8:6F:66:FE:9B", "username": "Avro", "last-paid": "0-0-0000" },
+  {
+    "mac": "60:6E:E8:D2:D1:79",
+    "username": "Imran (pasher building niche)",
+    "last-paid": "0-0-0000"
+  }
+]
