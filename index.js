@@ -45,11 +45,7 @@ async function run() {
         const cursor = await usersCollect.find({ admin: email });
         const users = await cursor.toArray();
 
-        if (users.length) {
-          res.send(users);
-        } else {
-          res.status(404).send("No data with current email Address");
-        }
+        res.send(users);
       } else {
         res.status(401).send("unauthorized");
       }
