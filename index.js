@@ -71,6 +71,14 @@ async function run() {
       }
     });
 
+    app.post("/signup", async (req, res) => {
+      const userData = req.body;
+
+      const cursor = await adminsCollect.insertOne(userData);
+
+      res.send(cursor);
+    });
+
     app.put("/users/:id", verifyJWT, async (req, res) => {
       const options = { upsert: true };
       const query = { _id: new ObjectId(req.params.id) };
