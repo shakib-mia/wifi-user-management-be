@@ -37,7 +37,7 @@ async function run() {
     const usersCollect = client.db("wifi").collection("users");
     const adminsCollect = client.db("wifi").collection("admin");
 
-    app.get("/users", verifyJWT, async (req, res) => {
+    app.get("/users", async (req, res) => {
       const { token } = req.headers;
       const { email } = jwt.verify(token, process.env.access_token_secret);
       const cursor = await usersCollect.find({ admin: email });
