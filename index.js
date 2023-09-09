@@ -40,10 +40,19 @@ async function run() {
     app.get("/users", verifyJWT, async (req, res) => {
       const { token } = req.headers;
       const { email } = jwt.verify(token, process.env.access_token_secret);
-      const cursor = await usersCollect.find({ admin: email });
-      const users = await cursor.toArray();
 
-      res.send(users);
+      if (email) {
+        const cursor = await usersCollect.find({ admin: email });
+        const users = await cursor.toArray();
+
+        if (users.length) {
+          res.send(users);
+        } else {
+          res.status(404).send("No data with current email Address");
+        }
+      } else {
+        res.status(401).send("unauthorized");
+      }
     });
 
     app.get("/login/:email/:password", async (req, res) => {
