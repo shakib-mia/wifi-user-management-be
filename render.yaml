@@ -1,0 +1,6 @@
+services:
+  - name: web
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
