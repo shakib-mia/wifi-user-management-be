@@ -39,15 +39,15 @@ async function run() {
 
     app.get("/users", verifyJWT, async (req, res) => {
       const { token } = req.headers;
-      const { email } = jwt.verify(token, process.env.access_token_secret);
+      const { _id } = jwt.verify(token, process.env.access_token_secret);
 
-      if (email) {
-        const cursor = await usersCollect.find({ admin: email });
+      if (_id) {
+        const cursor = await usersCollect.find({ admin: _id });
         const users = await cursor.toArray();
 
         res.send(users);
       } else {
-        res.status(401).send("unauthorized");
+        res.status(401).send("Unauthorized Access");
       }
     });
 
@@ -57,7 +57,7 @@ async function run() {
       if (user) {
         if (user.password === req.params.password) {
           const token = jwt.sign(
-            { email: user.email },
+            { _id: user._id },
             process.env.access_token_secret,
             { expiresIn: "1h" }
           );
@@ -74,9 +74,14 @@ async function run() {
     app.post("/signup", async (req, res) => {
       const userData = req.body;
 
-      const cursor = await adminsCollect.insertOne(userData);
+      const exist = await adminsCollect.findOne({ email: userData.email });
 
-      res.send(cursor);
+      if (!exist) {
+        const cursor = await adminsCollect.insertOne(userData);
+        res.send(cursor);
+      } else {
+        res.status(409).send({ message: "Email Already Exists" });
+      }
     });
 
     app.put("/users/:id", verifyJWT, async (req, res) => {
@@ -106,9 +111,19 @@ async function run() {
       const { token } = req.headers;
       // console.log(token);
       const { email } = jwt.verify(token, process.env.access_token_secret);
-      userData.admin = email;
+      const admin = await adminsCollect.findOne({ email });
+      // const data = await adminsCollect.findOne({ _id: admin._id });
+      userData.admin = admin._id;
       const cursor = await usersCollect.insertOne(userData);
 
+      res.send(cursor);
+    });
+
+    app.get("/admin", async (req, res) => {
+      const { token } = req.headers;
+      const { _id } = jwt.verify(token, process.env.access_token_secret);
+
+      const cursor = await adminsCollect.findOne({ _id: new ObjectId(_id) });
       res.send(cursor);
     });
   } finally {
