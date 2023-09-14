@@ -56,7 +56,7 @@ async function run() {
           const token = jwt.sign(
             { _id: user._id },
             process.env.access_token_secret,
-            { expiresIn: "10s" }
+            { expiresIn: "1h" }
           );
 
           res.send({ token });
