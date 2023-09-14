@@ -2,12 +2,18 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 4000;
 const app = express();
+const errorHandler = require("./errorHandler");
+const verifyJWT = require("./verifyJWT");
 require("dotenv").config();
 
 app.use(express.json());
 app.use(cors());
+app.use(errorHandler);
+app.use("/users", verifyJWT);
+app.use("/users/:id", verifyJWT);
+app.use("/admin", verifyJWT);
 
 app.get("/", (req, res) => {
   res.send(`from port ${port}`);
@@ -22,22 +28,13 @@ const client = new MongoClient(uri, {
   },
 });
 
-const verifyJWT = (req, res, next) => {
-  // console.log(req.headers.token);
-  if (!req.headers.token) {
-    res.status(401).send("unauthorized");
-  } else {
-    next();
-  }
-};
-
 async function run() {
   try {
     await client.connect();
     const usersCollect = client.db("wifi").collection("users");
     const adminsCollect = client.db("wifi").collection("admin");
 
-    app.get("/users", verifyJWT, async (req, res) => {
+    app.get("/users", async (req, res) => {
       const { token } = req.headers;
       const { _id } = jwt.verify(token, process.env.access_token_secret);
 
@@ -59,7 +56,7 @@ async function run() {
           const token = jwt.sign(
             { _id: user._id },
             process.env.access_token_secret,
-            { expiresIn: "1h" }
+            { expiresIn: "10s" }
           );
 
           res.send({ token });
@@ -84,7 +81,7 @@ async function run() {
       }
     });
 
-    app.put("/users/:id", verifyJWT, async (req, res) => {
+    app.put("/users/:id", async (req, res) => {
       const options = { upsert: true };
       const query = { _id: new ObjectId(req.params.id) };
       // const body
@@ -109,11 +106,8 @@ async function run() {
     app.post("/users/", async (req, res) => {
       const userData = req.body;
       const { token } = req.headers;
-      // console.log(token);
-      const { email } = jwt.verify(token, process.env.access_token_secret);
-      const admin = await adminsCollect.findOne({ email });
-      // const data = await adminsCollect.findOne({ _id: admin._id });
-      userData.admin = admin._id;
+      const { _id } = jwt.verify(token, process.env.access_token_secret);
+      userData.admin = _id;
       const cursor = await usersCollect.insertOne(userData);
 
       res.send(cursor);
