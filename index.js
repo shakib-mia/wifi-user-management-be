@@ -6,6 +6,7 @@ const port = process.env.PORT || 4000;
 const app = express();
 const errorHandler = require("./errorHandler");
 const verifyJWT = require("./verifyJWT");
+const nodemailer = require("nodemailer");
 require("dotenv").config();
 
 app.use(express.json());
@@ -14,6 +15,14 @@ app.use(errorHandler);
 app.use("/users", verifyJWT);
 app.use("/users/:id", verifyJWT);
 app.use("/admin", verifyJWT);
+
+const transporter = nodemailer.createTransport({
+  service: "Outlook", // e.g., 'Gmail', 'SMTP'
+  auth: {
+    user: process.env.emailAddress,
+    pass: process.env.emailPass,
+  },
+});
 
 app.get("/", (req, res) => {
   res.send(`from port ${port}`);
@@ -25,6 +34,7 @@ const client = new MongoClient(uri, {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
+    useUnifiedTopology: true,
   },
 });
 
@@ -69,12 +79,40 @@ async function run() {
     });
 
     app.post("/signup", async (req, res) => {
-      const userData = req.body;
+      const userData = { ...req.body, isVerified: false };
+      // console.log(userData);
 
       const exist = await adminsCollect.findOne({ email: userData.email });
 
       if (!exist) {
         const cursor = await adminsCollect.insertOne(userData);
+
+        const link = `http://localhost:5173/verify/${email
+          .split("@")
+          .join("at")
+          .split(".")
+          .join("dot")}`;
+
+        // console.log(userData.email);
+
+        var message = {
+          from: "abdullahalsamad@outlook.com",
+          to: userData.email,
+          subject: "Message title",
+          // text: "Plaintext version of the message",
+          html: `<p>Your Account has been created successfully. Now, <a href=${link}>Verify your email</a></p>`,
+        };
+
+        transporter.sendMail(message, (error, info) => {
+          if (error) {
+            console.error(error);
+            res.status(500).send("Error sending email");
+          } else {
+            console.log("Email sent: " + info.response);
+            res.send("Email sent successfully");
+          }
+        });
+
         res.send(cursor);
       } else {
         res.status(409).send({ message: "Email Already Exists" });
@@ -84,14 +122,13 @@ async function run() {
     app.put("/users/:id", async (req, res) => {
       const options = { upsert: true };
       const query = { _id: new ObjectId(req.params.id) };
-      // const body
 
       const updateUsersCollection = await usersCollect.updateOne(
         query,
         { $set: req.body },
         options
       );
-      // const updatedCursor = await updateUsersCollection.to
+
       res.send(updateUsersCollection);
     });
 
@@ -119,6 +156,27 @@ async function run() {
 
       const cursor = await adminsCollect.findOne({ _id: new ObjectId(_id) });
       res.send(cursor);
+    });
+
+    app.get("/verify/:email", async (req, res) => {
+      const { email } = req.params;
+      const user = await adminsCollect.findOne({ email });
+      const updatedData = { ...user, isVerified: true };
+      // const
+      // console.log(updatedData);
+
+      // console.log(link, email.split("at").join("@").split("dot").join("."));
+      if (user !== null) {
+        const updatedCursor = await adminsCollect.updateOne(
+          { _id: user._id },
+          { $set: updatedData },
+          { upsert: true }
+        );
+
+        res.send(updatedCursor);
+      } else {
+        res.send("user not found");
+      }
     });
   } finally {
   }
