@@ -1,63 +1,54 @@
 {
   "users": [
     {
-      "_id": "64fc0352e4ef4d0034f60856",
       "mac": "0C:90:43:5C:B3:BF",
       "username": "Niloy 1",
       "last-paid": "2023-09-09",
       "admin": "6505b514a6dbd4bd3b7af9a8"
     },
     {
-      "_id": "64fc036ce4ef4d0034f60857",
       "mac": "30:AF:CE:47:30:03",
       "username": "Niloy 2",
       "last-paid": "2023-09-09",
       "admin": "6505b514a6dbd4bd3b7af9a8"
     },
     {
-      "_id": "64fc0381e4ef4d0034f60858",
       "mac": "38:38:4B:A7:9C:50",
       "username": "Jamal vai",
       "last-paid": "2023-09-09",
       "admin": "6505b514a6dbd4bd3b7af9a8"
     },
     {
-      "_id": "64fc0390e4ef4d0034f60859",
       "mac": "F0:6C:5D:AE:30:D6",
       "username": "Ramisa",
       "last-paid": "2023-09-09",
       "admin": "6505b514a6dbd4bd3b7af9a8"
     },
     {
-      "_id": "64fc039fe4ef4d0034f6085a",
       "mac": "48:79:4D:FD:1E:23",
       "username": "Siyam",
       "last-paid": "2023-09-15",
       "admin": "6505b514a6dbd4bd3b7af9a8"
     },
     {
-      "_id": "64fc03b3e4ef4d0034f6085b",
       "mac": "48:02:86:88:DC:4F",
       "username": "Nishad",
       "last-paid": "2023-09-09",
       "admin": "6505b514a6dbd4bd3b7af9a8"
     },
     {
-      "_id": "64fc03c3e4ef4d0034f6085c",
       "mac": "88:B8:6F:66:FE:9B",
       "username": "Avro 1",
       "last-paid": "0-0-0000",
       "admin": "6505b514a6dbd4bd3b7af9a8"
     },
     {
-      "_id": "64fdc71658201b25ee4856f1",
       "mac": "F4:63:1F:22:AD:76\t",
       "username": "Avro 2",
       "last-paid": "0-0-0000",
       "admin": "6505b514a6dbd4bd3b7af9a8"
     },
     {
-      "_id": "65048047b716d40034c0f7a6",
       "mac": "60:6E:E8:D2:D1:79",
       "username": "Imran (pasher building niche)",
       "last-paid": "2023-09-09",

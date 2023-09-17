@@ -87,7 +87,7 @@ async function run() {
       if (!exist) {
         const cursor = await adminsCollect.insertOne(userData);
 
-        const link = `http://localhost:5173/verify/${email
+        const link = `http://localhost:5173/verify/${userData.email
           .split("@")
           .join("at")
           .split(".")
