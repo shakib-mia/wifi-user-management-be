@@ -98,7 +98,7 @@ async function run() {
         var message = {
           from: "abdullahalsamad@outlook.com",
           to: userData.email,
-          subject: "Message title",
+          subject: "Verify Your Email",
           // text: "Plaintext version of the message",
           html: `<p>Your Account has been created successfully. Now, <a href=${link}>Verify your email</a></p>`,
         };
