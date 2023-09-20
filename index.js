@@ -2,7 +2,7 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 5000;
 const app = express();
 const errorHandler = require("./errorHandler");
 const verifyJWT = require("./verifyJWT");
@@ -177,6 +177,66 @@ async function run() {
       } else {
         res.send("user not found");
       }
+    });
+
+    app.get("/otp/:email", async (req, res) => {
+      const { email } = req.params;
+      const user = await adminsCollect.findOne({ email });
+
+      if (user !== null) {
+        const otp = Math.floor(1000 + Math.random() * 9000);
+
+        const token = jwt.sign(
+          { email, otp },
+          process.env.access_token_secret,
+          { expiresIn: "1h" }
+        );
+        const data = jwt.decode(token);
+
+        res.send({ token });
+
+        // console.log(email);
+
+        var message = {
+          from: "abdullahalsamad@outlook.com",
+          to: email,
+          subject: "One Time Password",
+          // text: "Plaintext version of the message",
+          html: `<p>Your OTP is <h1>${data.otp}</h1></p>`,
+        };
+
+        transporter.sendMail(message, (error, info) => {
+          if (error) {
+            console.error(error);
+            res.status(500).send("Error sending email");
+          } else {
+            console.log("Email sent: " + info.response);
+            res.send("Email sent successfully");
+          }
+        });
+      }
+    });
+
+    app.post("/verify-otp", verifyJWT, async (req, res) => {
+      // const user = await adminsCollect.findOne({ email });
+      const { otp } = jwt.decode(req.headers.token);
+      res.send(req.body.value === otp);
+    });
+
+    app.put("/reset-password", verifyJWT, async (req, res) => {
+      const { email } = jwt.decode(
+        req.headers.token,
+        process.env.access_token_secret
+      );
+
+      const user = await adminsCollect.findOne({ email });
+      // console.log(req.body);
+      const updateCursor = await adminsCollect.updateOne(
+        { email },
+        { $set: { ...user, password: req.body.password } },
+        { $upsert: true }
+      );
+      res.send(updateCursor);
     });
   } finally {
   }
