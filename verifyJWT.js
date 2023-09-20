@@ -17,7 +17,7 @@ const verifyJWT = (req, res, next) => {
     next();
   } catch (err) {
     res.send(err);
-    console.log(err);
+    // console.log(err);
   }
 };
 
