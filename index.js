@@ -15,6 +15,8 @@ app.use(errorHandler);
 app.use("/users", verifyJWT);
 app.use("/users/:id", verifyJWT);
 app.use("/admin", verifyJWT);
+app.use("/verify-otp", verifyJWT);
+app.use("/reset-password", verifyJWT);
 
 const transporter = nodemailer.createTransport({
   service: "Outlook", // e.g., 'Gmail', 'SMTP'
@@ -156,6 +158,22 @@ async function run() {
 
       const cursor = await adminsCollect.findOne({ _id: new ObjectId(_id) });
       res.send(cursor);
+    });
+
+    app.put("/admin/:_id", async (req, res) => {
+      // console.log(req.body);
+      const { _id } = req.params;
+      const admin = req.body;
+
+      console.log({ ...admin });
+
+      const updateCursor = await adminsCollect.updateOne(
+        { _id: new ObjectId(_id) },
+        { $set: { ...admin } },
+        { $upsert: true }
+      );
+
+      res.send(updateCursor);
     });
 
     app.get("/verify/:email", async (req, res) => {
