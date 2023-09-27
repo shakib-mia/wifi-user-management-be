@@ -4,55 +4,55 @@
       "mac": "0C:90:43:5C:B3:BF",
       "username": "Niloy 1",
       "last-paid": "2023-09-09",
-      "admin": "6505b514a6dbd4bd3b7af9a8"
+      "admin": "65144a4c9a769534c04335c2"
     },
     {
       "mac": "30:AF:CE:47:30:03",
       "username": "Niloy 2",
       "last-paid": "2023-09-09",
-      "admin": "6505b514a6dbd4bd3b7af9a8"
-    },
-    {
-      "mac": "38:38:4B:A7:9C:50",
-      "username": "Jamal vai",
-      "last-paid": "2023-09-09",
-      "admin": "6505b514a6dbd4bd3b7af9a8"
+      "admin": "65144a4c9a769534c04335c2"
     },
     {
       "mac": "F0:6C:5D:AE:30:D6",
       "username": "Ramisa",
       "last-paid": "2023-09-09",
-      "admin": "6505b514a6dbd4bd3b7af9a8"
+      "admin": "65144a4c9a769534c04335c2"
     },
     {
       "mac": "48:79:4D:FD:1E:23",
       "username": "Siyam",
       "last-paid": "2023-09-15",
-      "admin": "6505b514a6dbd4bd3b7af9a8"
+      "admin": "65144a4c9a769534c04335c2"
     },
     {
       "mac": "48:02:86:88:DC:4F",
       "username": "Nishad",
       "last-paid": "2023-09-09",
-      "admin": "6505b514a6dbd4bd3b7af9a8"
+      "admin": "65144a4c9a769534c04335c2"
     },
     {
       "mac": "88:B8:6F:66:FE:9B",
       "username": "Avro 1",
       "last-paid": "0-0-0000",
-      "admin": "6505b514a6dbd4bd3b7af9a8"
+      "admin": "65144a4c9a769534c04335c2"
     },
     {
       "mac": "F4:63:1F:22:AD:76\t",
       "username": "Avro 2",
       "last-paid": "0-0-0000",
-      "admin": "6505b514a6dbd4bd3b7af9a8"
+      "admin": "65144a4c9a769534c04335c2"
     },
     {
       "mac": "60:6E:E8:D2:D1:79",
       "username": "Imran (pasher building niche)",
       "last-paid": "2023-09-09",
-      "admin": "6505b514a6dbd4bd3b7af9a8"
+      "admin": "65144a4c9a769534c04335c2"
+    },
+    {
+      "mac": "40:9A:30:53:09:87",
+      "username": "Arad",
+      "last-paid": "2023-09-27",
+      "admin": "65144a4c9a769534c04335c2"
     }
   ],
   "admins": [

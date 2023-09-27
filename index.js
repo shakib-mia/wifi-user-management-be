@@ -12,11 +12,17 @@ require("dotenv").config();
 app.use(express.json());
 app.use(cors());
 app.use(errorHandler);
-app.use("/users", verifyJWT);
-app.use("/users/:id", verifyJWT);
-app.use("/admin", verifyJWT);
-app.use("/verify-otp", verifyJWT);
-app.use("/reset-password", verifyJWT);
+
+const protectedRoutes = [
+  "/users",
+  "/users/:id",
+  "/admin",
+  "/admin/:_id",
+  "/verify-otp",
+  "/reset-password",
+];
+
+protectedRoutes.map((item) => app.use(item, verifyJWT));
 
 const transporter = nodemailer.createTransport({
   service: "Outlook", // e.g., 'Gmail', 'SMTP'
@@ -47,6 +53,7 @@ async function run() {
     const adminsCollect = client.db("wifi").collection("admin");
 
     app.get("/users", async (req, res) => {
+      // console.log();
       const { token } = req.headers;
       const { _id } = jwt.verify(token, process.env.access_token_secret);
 
@@ -89,11 +96,10 @@ async function run() {
       if (!exist) {
         const cursor = await adminsCollect.insertOne(userData);
 
-        const link = `http://localhost:5173/verify/${userData.email
-          .split("@")
-          .join("at")
-          .split(".")
-          .join("dot")}`;
+        const link =
+          req.headers.referer +
+          "verify/" +
+          userData.email.split("@").join("at").split(".").join("dot");
 
         // console.log(userData.email);
 
@@ -158,6 +164,52 @@ async function run() {
 
       const cursor = await adminsCollect.findOne({ _id: new ObjectId(_id) });
       res.send(cursor);
+    });
+
+    app.put("/change-email/:_id", async (req, res) => {
+      const userData = { ...req.body, isVerified: false };
+
+      // console.log(req.body);
+      const { _id } = req.params;
+      const admin = req.body;
+
+      // console.log({ ...admin });
+      const exist = await adminsCollect.findOne({ email: admin.email });
+
+      if (!exist) {
+        const updateCursor = await adminsCollect.updateOne(
+          { _id: new ObjectId(_id) },
+          { $set: { ...admin, isVerified: false } },
+          { $upsert: true }
+        );
+
+        const link =
+          req.headers.referer +
+          "verify/" +
+          userData.email.split("@").join("at").split(".").join("dot");
+
+        // console.log(userData.email);
+
+        var message = {
+          from: "abdullahalsamad@outlook.com",
+          to: userData.email,
+          subject: "Verify Your Email",
+          // text: "Plaintext version of the message",
+          html: `<p>Your Email has been updated successfully. Now, <a href=${link}>Verify your email</a></p>`,
+        };
+
+        transporter.sendMail(message, (error, info) => {
+          if (error) {
+            res.status(500).send("Error sending email");
+          } else {
+            res.send("Email sent successfully. Check Your Email to Verify");
+          }
+        });
+
+        // res.send(updateCursor);
+      } else {
+        res.status(409).send("Email Already in Use");
+      }
     });
 
     app.put("/admin/:_id", async (req, res) => {
@@ -255,6 +307,17 @@ async function run() {
         { $upsert: true }
       );
       res.send(updateCursor);
+    });
+
+    app.delete("/admin/:_id", async (req, res) => {
+      const { _id } = req.params;
+
+      const adminDelete = await adminsCollect.deleteOne({
+        _id: new ObjectId(_id),
+      });
+      const usersDelete = await usersCollect.deleteMany({ admin: _id });
+
+      res.send({ adminDelete, usersDelete });
     });
   } finally {
   }
