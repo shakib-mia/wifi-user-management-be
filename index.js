@@ -9,8 +9,8 @@ const verifyJWT = require("./verifyJWT");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 app.use(errorHandler);
 
 const protectedRoutes = [
@@ -20,6 +20,7 @@ const protectedRoutes = [
   "/admin/:_id",
   "/verify-otp",
   "/reset-password",
+  "/compress",
 ];
 
 protectedRoutes.map((item) => app.use(item, verifyJWT));
@@ -53,7 +54,6 @@ async function run() {
     const adminsCollect = client.db("wifi").collection("admin");
 
     app.get("/users", async (req, res) => {
-      // console.log();
       const { token } = req.headers;
       const { _id } = jwt.verify(token, process.env.access_token_secret);
 
@@ -68,6 +68,7 @@ async function run() {
     });
 
     app.get("/login/:email/:password", async (req, res) => {
+      // console.log(req.params.email, req.params.password);
       const user = await adminsCollect.findOne({ email: req.params.email });
 
       if (user) {
@@ -89,7 +90,6 @@ async function run() {
 
     app.post("/signup", async (req, res) => {
       const userData = { ...req.body, isVerified: false };
-      // console.log(userData);
 
       const exist = await adminsCollect.findOne({ email: userData.email });
 
@@ -100,8 +100,6 @@ async function run() {
           req.headers.referer +
           "verify/" +
           userData.email.split("@").join("at").split(".").join("dot");
-
-        // console.log(userData.email);
 
         var message = {
           from: "abdullahalsamad@outlook.com",
@@ -169,11 +167,9 @@ async function run() {
     app.put("/change-email/:_id", async (req, res) => {
       const userData = { ...req.body, isVerified: false };
 
-      // console.log(req.body);
       const { _id } = req.params;
       const admin = req.body;
 
-      // console.log({ ...admin });
       const exist = await adminsCollect.findOne({ email: admin.email });
 
       if (!exist) {
@@ -187,8 +183,6 @@ async function run() {
           req.headers.referer +
           "verify/" +
           userData.email.split("@").join("at").split(".").join("dot");
-
-        // console.log(userData.email);
 
         var message = {
           from: "abdullahalsamad@outlook.com",
@@ -213,11 +207,8 @@ async function run() {
     });
 
     app.put("/admin/:_id", async (req, res) => {
-      // console.log(req.body);
       const { _id } = req.params;
       const admin = req.body;
-
-      console.log({ ...admin });
 
       const updateCursor = await adminsCollect.updateOne(
         { _id: new ObjectId(_id) },
@@ -233,9 +224,7 @@ async function run() {
       const user = await adminsCollect.findOne({ email });
       const updatedData = { ...user, isVerified: true };
       // const
-      // console.log(updatedData);
 
-      // console.log(link, email.split("at").join("@").split("dot").join("."));
       if (user !== null) {
         const updatedCursor = await adminsCollect.updateOne(
           { _id: user._id },
@@ -259,20 +248,22 @@ async function run() {
         const token = jwt.sign(
           { email, otp },
           process.env.access_token_secret,
-          { expiresIn: "1h" }
+          { expiresIn: "60s" }
         );
         const data = jwt.decode(token);
 
         res.send({ token });
-
-        // console.log(email);
 
         var message = {
           from: "abdullahalsamad@outlook.com",
           to: email,
           subject: "One Time Password",
           // text: "Plaintext version of the message",
-          html: `<p>Your OTP is <h1>${data.otp}</h1></p>`,
+          html: `<div>
+          Your OTP is 
+          <h1>${data.otp}</h1>
+          your otp will be expired within a minute
+          </div>`,
         };
 
         transporter.sendMail(message, (error, info) => {
@@ -300,7 +291,7 @@ async function run() {
       );
 
       const user = await adminsCollect.findOne({ email });
-      // console.log(req.body);
+
       const updateCursor = await adminsCollect.updateOne(
         { email },
         { $set: { ...user, password: req.body.password } },
@@ -310,6 +301,7 @@ async function run() {
     });
 
     app.delete("/admin/:_id", async (req, res) => {
+      // console.log(req.params);
       const { _id } = req.params;
 
       const adminDelete = await adminsCollect.deleteOne({
@@ -319,6 +311,70 @@ async function run() {
 
       res.send({ adminDelete, usersDelete });
     });
+
+    app.post("/compress", async (req, res) => {
+      console.log(req);
+    });
+
+    // app.post("/tinify", async (req, res) => {
+    //   const apiKey = "YXBpOmFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6MDEyMzQ1";
+    //   console.log(req);
+    //   // // console.log(req);
+
+    //   // if (req.body instanceof FormData) {
+    //   //   // Do something with the FormData
+    //   //   console.log("Received FormData");
+    //   // } else {
+    //   //   console.log("Received other data");
+    //   // }
+
+    //   function compressImage(dataURL, quality) {
+    //     const img = new Image();
+    //     img.src = dataURL;
+
+    //     img.onload = function () {
+    //       const canvas = document.createElement("canvas");
+    //       canvas.width = img.width;
+    //       canvas.height = img.height;
+    //       const ctx = canvas.getContext("2d");
+    //       ctx.drawImage(img, 0, 0);
+
+    //       // Convert the image to a data URL with the specified quality
+    //       const compressedDataURL = canvas.toDataURL("image/jpeg", quality);
+    //       const resultImage = document.getElementById("resultImage");
+    //       resultImage.src = compressedDataURL;
+    //     };
+    //   }
+
+    //   // compressImage(req.body);
+
+    //   // res.send({ data: req.body });
+
+    //   // Convert the file buffer to a Base64 string
+    //   // const fileBuffer = req.file.buffer.toString("base64");
+
+    //   // // Make the Axios request
+    //   // const response = await axios.post(
+    //   //   "https://api.tinify.com/shrink",
+    //   //   fileBuffer,
+    //   //   {
+    //   //     headers: {
+    //   //       "Content-Type": "application/json",
+    //   //       Authorization: `Basic ${Buffer.from(`api:${apiKey}`).toString(
+    //   //         "base64"
+    //   //       )}`,
+    //   //     },
+    //   //   }
+    //   // );
+
+    //   // // Handle the API response as needed
+    //   // const compressedData = response.data;
+
+    //   // // Send the compressed data back as a response
+    //   // res.json(compressedData);
+
+    //   res.send(req.body);
+    // });
   } finally {
   }
 }

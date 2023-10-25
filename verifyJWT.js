@@ -10,15 +10,16 @@ const verifyJWT = (req, res, next) => {
 
   try {
     const user = jwt.verify(token, process.env.access_token_secret);
+    // console.log(user.header);
 
     if (currentTime >= user.exp * 1000) {
-      return res.status(401).send("Token has expired");
+      return res.status(401).send({ message: "Token has expired" });
     }
 
     next();
   } catch (err) {
-    res.send(err);
-    // console.log(err);
+    res.status(401).send(err);
+    // console.log(err.name, err.message, err);
   }
 };
 
